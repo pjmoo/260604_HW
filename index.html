@@ -1,0 +1,1627 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>소담 🌿 | 포근하고 편안한 AI 챗봇</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Axios CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+      :root {
+        --bg-main: #faf8f5;
+        --bg-sidebar: #f5f1eb;
+        --bg-card: #ffffff;
+        --primary: #6c8c7c;
+        --primary-light: #edf3f0;
+        --primary-hover: #587365;
+        --secondary: #d69680;
+        --secondary-light: #fdf4f1;
+        --secondary-hover: #c4836d;
+        --border: #eae4db;
+        --text-main: #2f3834;
+        --text-muted: #73807a;
+        --text-white: #ffffff;
+        --shadow-sm: 0 2px 8px rgba(108, 140, 124, 0.04);
+        --shadow-md: 0 8px 24px rgba(108, 140, 124, 0.06);
+        --shadow-lg: 0 16px 40px rgba(108, 140, 124, 0.1);
+        --radius-lg: 20px;
+        --radius-md: 14px;
+        --radius-sm: 8px;
+        --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        --font-family: "Plus Jakarta Sans", "Noto Sans KR", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--font-family);
+        background-color: var(--bg-main);
+        color: var(--text-main);
+        height: 100vh;
+        display: flex;
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* 레이아웃 구조 */
+      .app-container {
+        display: flex;
+        width: 100%;
+        height: 100vh;
+        position: relative;
+      }
+
+      /* 사이드바 스타일 (설정 패널) */
+      .sidebar {
+        width: 340px;
+        background-color: var(--bg-sidebar);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        padding: 30px 24px;
+        flex-shrink: 0;
+        transition: var(--transition);
+        z-index: 10;
+      }
+
+      .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 36px;
+      }
+
+      .brand-logo {
+        width: 44px;
+        height: 44px;
+        background-color: var(--primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-white);
+        font-size: 20px;
+        box-shadow: 0 4px 12px rgba(108, 140, 124, 0.2);
+      }
+
+      .brand-info h1 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-main);
+        letter-spacing: -0.5px;
+      }
+
+      .brand-info p {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      .sidebar-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .card-title {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .card-title svg {
+        width: 16px;
+        height: 16px;
+        color: var(--primary);
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .form-group:last-child {
+        margin-bottom: 0;
+      }
+
+      .form-group label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+
+      .custom-select {
+        width: 100%;
+        background-color: var(--bg-main);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 10px 12px;
+        font-size: 0.88rem;
+        color: var(--text-main);
+        font-family: var(--font-family);
+        outline: none;
+        transition: var(--transition);
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2373807a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 14px;
+        padding-right: 36px;
+      }
+
+      .custom-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(108, 140, 124, 0.15);
+      }
+
+      .btn {
+        width: 100%;
+        border: none;
+        border-radius: var(--radius-sm);
+        padding: 12px 16px;
+        font-size: 0.88rem;
+        font-weight: 500;
+        font-family: var(--font-family);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: var(--transition);
+      }
+
+      .btn-secondary {
+        background-color: var(--bg-main);
+        border: 1px solid var(--border);
+        color: var(--text-main);
+      }
+
+      .btn-secondary:hover {
+        background-color: #eee9e0;
+        color: var(--text-main);
+      }
+
+      .btn-primary {
+        background-color: var(--primary);
+        color: var(--text-white);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--primary-hover);
+      }
+
+      .sidebar-footer {
+        margin-top: auto;
+        text-align: center;
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        border-top: 1px solid var(--border);
+        padding-top: 20px;
+      }
+
+      /* 메인 채팅 영역 */
+      .chat-area {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background-color: var(--bg-main);
+        position: relative;
+      }
+
+      /* 채팅 헤더 */
+      .chat-header {
+        height: 76px;
+        border-bottom: 1px solid var(--border);
+        background-color: var(--bg-card);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 30px;
+        z-index: 5;
+      }
+
+      .header-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #88c0a4;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 8px #88c0a4;
+      }
+
+      .active-model-badge {
+        background-color: var(--primary-light);
+        color: var(--primary-hover);
+        font-size: 0.78rem;
+        padding: 4px 10px;
+        border-radius: 30px;
+        font-weight: 500;
+        border: 1px solid rgba(108, 140, 124, 0.15);
+      }
+
+      /* 채팅방 컨테이너 */
+      .chat-messages {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 40px 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        scroll-behavior: smooth;
+      }
+
+      /* 빈 대화 상태 (웰컴 스크린) */
+      .welcome-screen {
+        margin: auto;
+        max-width: 580px;
+        text-align: center;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: fadeIn 0.6s ease;
+      }
+
+      .welcome-icon {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+        animation: float 4s ease-in-out infinite;
+      }
+
+      .welcome-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 10px;
+      }
+
+      .welcome-desc {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 30px;
+      }
+
+      .suggestion-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        width: 100%;
+      }
+
+      .suggestion-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 16px;
+        text-align: left;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .suggestion-card:hover {
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        background-color: var(--primary-light);
+      }
+
+      .suggestion-tag {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--primary-hover);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .suggestion-text {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text-main);
+        line-height: 1.4;
+      }
+
+      /* 대화 버블 스타일 */
+      .message-row {
+        display: flex;
+        gap: 14px;
+        max-width: 800px;
+        width: 100%;
+        animation: slideIn 0.3s ease;
+      }
+
+      .message-row.user {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+      }
+
+      .message-row.bot {
+        align-self: flex-start;
+      }
+
+      .avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .user .avatar {
+        background-color: var(--secondary);
+        color: var(--text-white);
+      }
+
+      .bot .avatar {
+        background-color: var(--primary);
+        color: var(--text-white);
+      }
+
+      .message-content-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        max-width: calc(100% - 60px);
+      }
+
+      .user .message-content-wrapper {
+        align-items: flex-end;
+      }
+
+      .sender-name {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 0 4px;
+      }
+
+      .bubble {
+        padding: 14px 18px;
+        border-radius: var(--radius-md);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        word-break: break-word;
+        position: relative;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .user .bubble {
+        background-color: var(--primary-light);
+        color: var(--text-main);
+        border-top-right-radius: 0;
+        border: 1px solid rgba(108, 140, 124, 0.1);
+      }
+
+      .bot .bubble {
+        background-color: var(--bg-card);
+        color: var(--text-main);
+        border-top-left-radius: 0;
+        border: 1px solid var(--border);
+      }
+
+      .message-time {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+        align-self: flex-end;
+      }
+
+      .user .message-time {
+        align-self: flex-start;
+        margin-left: 4px;
+      }
+
+      /* 채팅 입력 공간 */
+      .input-panel {
+        padding: 20px 30px 30px 30px;
+        background-color: var(--bg-main);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 5;
+      }
+
+      .input-wrapper {
+        max-width: 800px;
+        width: 100%;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        padding: 10px 14px 10px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: var(--transition);
+      }
+
+      .input-wrapper:focus-within {
+        border-color: var(--primary);
+        box-shadow:
+          var(--shadow-lg),
+          0 0 0 3px rgba(108, 140, 124, 0.1);
+      }
+
+      .chat-textarea {
+        flex-grow: 1;
+        border: none;
+        resize: none;
+        height: 24px;
+        max-height: 120px;
+        font-family: var(--font-family);
+        font-size: 0.95rem;
+        color: var(--text-main);
+        outline: none;
+        padding: 2px 0;
+        background: transparent;
+        line-height: 1.5;
+      }
+
+      .chat-textarea::placeholder {
+        color: var(--text-muted);
+        opacity: 0.7;
+      }
+
+      .send-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        border: none;
+        color: var(--text-white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        flex-shrink: 0;
+      }
+
+      .send-btn:hover {
+        background-color: var(--primary-hover);
+        transform: scale(1.05);
+      }
+
+      .send-btn:active {
+        transform: scale(0.95);
+      }
+
+      .send-btn svg {
+        width: 18px;
+        height: 18px;
+        transform: rotate(45deg);
+        margin-left: -2px;
+        margin-top: 2px;
+      }
+
+      /* 타이핑 인디케이터 */
+      .typing-indicator {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 10px;
+      }
+
+      .typing-dot {
+        width: 6px;
+        height: 6px;
+        background-color: var(--text-muted);
+        border-radius: 50%;
+        opacity: 0.4;
+        animation: typing 1.4s infinite ease-in-out;
+      }
+
+      .typing-dot:nth-child(1) {
+        animation-delay: 0s;
+      }
+      .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      /* 마크다운 스타일링 */
+      .bubble p {
+        margin-bottom: 8px;
+      }
+      .bubble p:last-child {
+        margin-bottom: 0;
+      }
+      .bubble ul,
+      .bubble ol {
+        margin-left: 20px;
+        margin-bottom: 8px;
+      }
+      .bubble li {
+        margin-bottom: 4px;
+      }
+      .bubble h1,
+      .bubble h2,
+      .bubble h3,
+      .bubble h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-top: 12px;
+        margin-bottom: 6px;
+        color: var(--text-main);
+      }
+      .bubble h1:first-child,
+      .bubble h2:first-child,
+      .bubble h3:first-child {
+        margin-top: 0;
+      }
+
+      .inline-code {
+        background-color: var(--primary-light);
+        color: var(--primary-hover);
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      /* 코드 블록 스타일 */
+      .code-block-wrapper {
+        background-color: #faf7f2;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        margin: 12px 0;
+        font-family: monospace;
+      }
+
+      .code-block-header {
+        background-color: #f1ebd8;
+        padding: 8px 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .copy-code-btn {
+        background: transparent;
+        border: 1px solid var(--primary);
+        border-radius: 4px;
+        color: var(--primary);
+        padding: 2px 8px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: var(--transition);
+      }
+
+      .copy-code-btn:hover {
+        background-color: var(--primary);
+        color: var(--text-white);
+      }
+
+      .code-block-wrapper pre {
+        padding: 14px;
+        overflow-x: auto;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        color: #3b4240;
+      }
+
+      /* 커스텀 토스트 알림 */
+      .toast {
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background-color: var(--text-main);
+        color: var(--text-white);
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        opacity: 0;
+        pointer-events: none;
+        transition: var(--transition);
+        z-index: 1000;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .toast.show {
+        opacity: 0.95;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* 토글 스위치 (사이드바용) */
+      .setting-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .setting-row:last-child {
+        margin-bottom: 0;
+      }
+      .setting-row span {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 22px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--border);
+        transition: 0.3s;
+        border-radius: 34px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+        box-shadow: var(--shadow-sm);
+      }
+      input:checked + .slider {
+        background-color: var(--primary);
+      }
+      input:checked + .slider:before {
+        transform: translateX(22px);
+      }
+
+      /* 스크롤바 커스텀 */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #dfd7cc;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #cbc0b3;
+      }
+
+      /* 모바일 대응 토글 */
+      .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-main);
+        padding: 4px;
+      }
+
+      /* 애니메이션 */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(15px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes typing {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-4px);
+        }
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      /* 미디어 쿼리 (반응형 모바일 화면) */
+      @media (max-width: 768px) {
+        .app-container {
+          flex-direction: column;
+        }
+        .sidebar {
+          width: 100%;
+          height: auto;
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+          padding: 20px;
+          display: none; /* 토글 기능으로 작동 */
+        }
+        .sidebar.open {
+          display: flex;
+        }
+        .mobile-menu-btn {
+          display: block;
+        }
+        .chat-messages {
+          padding: 20px 16px;
+        }
+        .suggestion-grid {
+          grid-template-columns: 1fr;
+        }
+        .input-panel {
+          padding: 10px 16px 20px 16px;
+        }
+        .welcome-title {
+          font-size: 1.3rem;
+        }
+        .welcome-desc {
+          font-size: 0.85rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- 사이드바 설정 화면 -->
+      <aside class="sidebar" id="sidebar">
+        <div class="brand-section">
+          <div class="brand-logo">🌿</div>
+          <div class="brand-info">
+            <h1>소담 챗봇</h1>
+            <p>따뜻한 소통의 공간</p>
+          </div>
+        </div>
+
+        <!-- 모델 및 프로바이더 선택 카드 -->
+        <div class="sidebar-card">
+          <div class="card-title">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+              ></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            엔진 설정
+          </div>
+          <div class="form-group">
+            <label for="providerSelect">AI 서비스 제공자</label>
+            <select id="providerSelect" class="custom-select" name="provider">
+              <option value="google">Google Gemini</option>
+              <option value="groq">Groq Cloud</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="modelSelect">AI 언어 모델</label>
+            <select id="modelSelect" class="custom-select" name="model">
+              <!-- 자바스크립트로 동적 로드 -->
+            </select>
+          </div>
+        </div>
+
+        <!-- 부가 편의기능 설정 카드 -->
+        <div class="sidebar-card">
+          <div class="card-title">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+              ></path>
+            </svg>
+            채팅 옵션
+          </div>
+          <div class="setting-row">
+            <span>대화 백업 유지</span>
+            <label class="switch">
+              <input type="checkbox" id="saveHistoryToggle" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div style="margin-top: 16px">
+            <button id="clearChatBtn" class="btn btn-secondary">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path
+                  d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                ></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+              모든 대화 지우기
+            </button>
+          </div>
+        </div>
+
+        <div class="sidebar-footer">
+          <p>© 2026 소담 🌿 Cozy Chatbot</p>
+          <p style="margin-top: 4px; font-size: 0.65rem">
+            Designed for cozy & mindful dialogues
+          </p>
+        </div>
+      </aside>
+
+      <!-- 채팅창 본문 -->
+      <main class="chat-area">
+        <!-- 채팅 헤더 -->
+        <header class="chat-header">
+          <div class="header-info">
+            <!-- 모바일 사이드바 열기 버튼 -->
+            <button
+              class="mobile-menu-btn"
+              id="mobileMenuBtn"
+              aria-label="메뉴 열기"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <span class="status-dot"></span>
+            <h2 style="font-size: 1rem; font-weight: 600" id="chatTitle">
+              소담 🌿
+            </h2>
+          </div>
+          <div>
+            <span class="active-model-badge" id="activeModelBadge"
+              >Google | gemini-2.5-flash</span
+            >
+          </div>
+        </header>
+
+        <!-- 메시지 대화 로그 영역 -->
+        <section class="chat-messages" id="chatContainer">
+          <!-- 대화가 비어 있을 때 표시되는 웰컴 카드 -->
+          <div class="welcome-screen" id="welcomeScreen">
+            <div class="welcome-icon">🍵</div>
+            <h3 class="welcome-title">안녕하세요! 소담입니다.</h3>
+            <p class="welcome-desc">
+              차가운 기계식 AI 대신, 편안하게 쉴 수 있는 따뜻한 찻집을 닮은
+              공간입니다.<br />
+              오늘 있었던 사소한 고민이나 정리되지 않은 생각들을 편히 꺼내어
+              보세요.
+            </p>
+
+            <div class="suggestion-grid">
+              <div
+                class="suggestion-card"
+                onclick="
+                  usePreset(
+                    '오늘 하루 피로를 풀어줄 따뜻한 홈카페 메뉴를 어울리는 책과 함께 어울려 추천해줄래?',
+                  )
+                "
+              >
+                <span class="suggestion-tag">힐링/추천 ☕</span>
+                <span class="suggestion-text"
+                  >"홈카페 메뉴와 어울리는 책 추천해줘"</span
+                >
+              </div>
+              <div
+                class="suggestion-card"
+                onclick="
+                  usePreset(
+                    '바쁘고 정신없는 일상 속에서 편안하게 마음의 휴식을 가질 수 있는 1분 스트레칭이나 호흡법을 알려줘.',
+                  )
+                "
+              >
+                <span class="suggestion-tag">휴식/마음 🧘</span>
+                <span class="suggestion-text"
+                  >"마음의 휴식을 위한 1분 호흡법"</span
+                >
+              </div>
+              <div
+                class="suggestion-card"
+                onclick="
+                  usePreset(
+                    '최근 고마웠던 은사님 혹은 오랫동안 못 만난 친구에게 보낼 따뜻하고 진심 어린 편지 문구를 하나 작성해줘.',
+                  )
+                "
+              >
+                <span class="suggestion-tag">창작/다정 ✉️</span>
+                <span class="suggestion-text"
+                  >"지인에게 보낼 다정한 손편지 문구 작성"</span
+                >
+              </div>
+              <div
+                class="suggestion-card"
+                onclick="
+                  usePreset(
+                    '프로그래밍할 때 비동기 처리(Async/Await)와 프로미스(Promise)의 개념 차이를 아주 쉽고 말랑한 비유를 들어서 차근차근 설명해줄래?',
+                  )
+                "
+              >
+                <span class="suggestion-tag">학습/설명 💡</span>
+                <span class="suggestion-text"
+                  >"비동기 처리 개념을 아주 쉽게 비유해줘"</span
+                >
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 채팅 입력바 영역 -->
+        <footer class="input-panel">
+          <form
+            id="chatForm"
+            style="width: 100%; display: flex; justify-content: center"
+          >
+            <div class="input-wrapper">
+              <textarea
+                id="askInput"
+                class="chat-textarea"
+                placeholder="소담에게 메시지를 남겨보세요... (Shift + Enter로 줄바꿈)"
+                rows="1"
+                name="ask"
+                required
+              ></textarea>
+              <button
+                type="submit"
+                class="send-btn"
+                id="sendBtn"
+                title="메시지 전송"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </footer>
+      </main>
+    </div>
+
+    <!-- 토스트 알림창 -->
+    <div id="toast" class="toast">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span id="toastMsg">텍스트가 복사되었습니다.</span>
+    </div>
+
+    <script>
+      // 제공자별 사용 가능한 모델 리스트
+      const modelsByProvider = {
+        google: [
+          {
+            value: "gemini-2.5-flash",
+            label: "Gemini 2.5 Flash (추천 - 매우 빠름)",
+          },
+          { value: "gemini-2.0-flash", label: "Gemini 2.0 Flash (밸런스)" },
+          { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash" },
+          { value: "gemini-1.5-pro", label: "Gemini 1.5 Pro (깊이 있는 대화)" },
+        ],
+        groq: [
+          {
+            value: "llama-3.3-70b-versatile",
+            label: "Llama 3.3 70B (똑똑한 응답)",
+          },
+          { value: "llama3-8b-8192", label: "Llama 3 8B (신속한 응답)" },
+          { value: "gemma2-9b-it", label: "Gemma 2 9B (구글 경량 모델)" },
+          { value: "mixtral-8x7b-32768", label: "Mixtral 8x7B (멀티용)" },
+        ],
+      };
+
+      // DOM 요소 선택
+      const providerSelect = document.getElementById("providerSelect");
+      const modelSelect = document.getElementById("modelSelect");
+      const chatForm = document.getElementById("chatForm");
+      const askInput = document.getElementById("askInput");
+      const chatContainer = document.getElementById("chatContainer");
+      const welcomeScreen = document.getElementById("welcomeScreen");
+      const activeModelBadge = document.getElementById("activeModelBadge");
+      const clearChatBtn = document.getElementById("clearChatBtn");
+      const saveHistoryToggle = document.getElementById("saveHistoryToggle");
+      const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+      const sidebar = document.getElementById("sidebar");
+
+      // 챗 기록 배열
+      let conversationHistory = [];
+
+      // 초기화 함수
+      function init() {
+        // 이벤트 바인딩
+        providerSelect.addEventListener("change", handleProviderChange);
+        modelSelect.addEventListener("change", updateActiveBadge);
+        chatForm.addEventListener("submit", handleChatSubmit);
+        askInput.addEventListener("keydown", handleTextAreaKeydown);
+        askInput.addEventListener("input", autoResizeTextArea);
+        clearChatBtn.addEventListener("click", clearHistory);
+        mobileMenuBtn.addEventListener("click", toggleSidebar);
+
+        // 로컬 스토리지에 백업된 내역 불러오기
+        loadChatFromLocalStorage();
+
+        // 제공자에 따른 모델 채우기 초기 수행
+        populateModels(providerSelect.value);
+      }
+
+      // 모바일 사이드바 토글
+      function toggleSidebar() {
+        sidebar.classList.toggle("open");
+      }
+
+      // 화면 아무 데나 누르면 모바일 사이드바 닫히기
+      document.addEventListener("click", (e) => {
+        if (window.innerWidth <= 768) {
+          if (
+            !sidebar.contains(e.target) &&
+            !mobileMenuBtn.contains(e.target) &&
+            sidebar.classList.contains("open")
+          ) {
+            sidebar.classList.remove("open");
+          }
+        }
+      });
+
+      // 제공자 셀렉트 변경 시 모델 드롭다운 동적 로드
+      function handleProviderChange() {
+        populateModels(providerSelect.value);
+      }
+
+      function populateModels(provider) {
+        modelSelect.innerHTML = "";
+        const models = modelsByProvider[provider] || [];
+        models.forEach((model) => {
+          const option = document.createElement("option");
+          option.value = model.value;
+          option.textContent = model.label;
+          modelSelect.appendChild(option);
+        });
+        updateActiveBadge();
+      }
+
+      // 활성화된 모델 배지 갱신
+      function updateActiveBadge() {
+        const providerLabel =
+          providerSelect.options[providerSelect.selectedIndex].text;
+        const modelValue = modelSelect.value;
+        activeModelBadge.textContent = `${providerLabel.split(" ")[0]} | ${modelValue}`;
+      }
+
+      // 텍스트 영역 자동 크기 조절
+      function autoResizeTextArea() {
+        askInput.style.height = "24px";
+        const scrollHeight = askInput.scrollHeight;
+        if (scrollHeight > 24) {
+          askInput.style.height = Math.min(scrollHeight, 120) + "px";
+        }
+      }
+
+      // 텍스트 영역 키보드 입력 핸들러 (Enter 전송 / Shift+Enter 줄바꿈)
+      function handleTextAreaKeydown(event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          chatForm.requestSubmit();
+        }
+      }
+
+      // 제안 카드(프리셋) 선택 시 전송 처리
+      function usePreset(text) {
+        askInput.value = text;
+        autoResizeTextArea();
+        chatForm.requestSubmit();
+      }
+
+      // 대화 로그 전송
+      async function handleChatSubmit(event) {
+        event.preventDefault();
+        const askText = askInput.value.trim();
+        if (!askText) return;
+
+        // 웰컴 스크린 숨기기
+        if (welcomeScreen) {
+          welcomeScreen.style.display = "none";
+        }
+
+        const provider = providerSelect.value;
+        const model = modelSelect.value;
+
+        // 사용자 메시지 화면 출력 및 이력 추가
+        appendMessage("user", askText);
+        askInput.value = "";
+        autoResizeTextArea();
+
+        // 전송 버튼 비활성화 및 타이핑 인디케이터 추가
+        setLoading(true);
+        const indicator = appendTypingIndicator();
+
+        try {
+          console.log("[클라이언트 API 요청 시작]");
+          const response = await axios.post("/chat", {
+            provider,
+            model,
+            ask: askText,
+          });
+          console.log("[클라이언트 API 요청 완료]");
+
+          // 타이핑 인디케이터 제거
+          removeTypingIndicator(indicator);
+
+          if (response.data && response.data.result) {
+            appendMessage("bot", response.data.result);
+          } else if (response.data && response.data.error) {
+            appendMessage(
+              "bot",
+              `⚠️ 오류가 발생했습니다: ${response.data.error}`,
+            );
+          } else {
+            appendMessage("bot", `⚠️ 응답 형식이 올바르지 않습니다.`);
+          }
+        } catch (error) {
+          console.error(error);
+          removeTypingIndicator(indicator);
+          const errMsg =
+            error.response && error.response.data && error.response.data.error
+              ? error.response.data.error
+              : error.message;
+          appendMessage(
+            "bot",
+            `⚠️ 서버 통신에 실패했습니다.\n\n오류 내용: ${errMsg}`,
+          );
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      // 로딩 상태 제어
+      function setLoading(isLoading) {
+        const sendBtn = document.getElementById("sendBtn");
+        if (isLoading) {
+          sendBtn.disabled = true;
+          sendBtn.style.opacity = "0.5";
+          askInput.disabled = true;
+        } else {
+          sendBtn.disabled = false;
+          sendBtn.style.opacity = "1";
+          askInput.disabled = false;
+          askInput.focus();
+        }
+      }
+
+      // 화면 메시지 추가
+      function appendMessage(sender, text) {
+        // 웰컴 스크린 제거 체크
+        if (welcomeScreen.style.display !== "none") {
+          welcomeScreen.style.display = "none";
+        }
+
+        const now = new Date();
+        const timeString = now.toLocaleTimeString("ko-KR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        const messageRow = document.createElement("div");
+        messageRow.className = `message-row ${sender}`;
+
+        const avatar = document.createElement("div");
+        avatar.className = "avatar";
+        avatar.innerHTML = sender === "user" ? "나" : "🌿";
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "message-content-wrapper";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "sender-name";
+        nameSpan.textContent = sender === "user" ? "나" : "소담 🌿";
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+
+        if (sender === "bot") {
+          // 마크다운 파싱 수행
+          bubble.innerHTML = parseMarkdown(text);
+        } else {
+          // 일반 텍스트는 줄바꿈 보존
+          bubble.innerHTML = text.replace(/\n/g, "<br>");
+        }
+
+        const timeSpan = document.createElement("span");
+        timeSpan.className = "message-time";
+        timeSpan.textContent = timeString;
+
+        wrapper.appendChild(nameSpan);
+        wrapper.appendChild(bubble);
+        wrapper.appendChild(timeSpan);
+
+        messageRow.appendChild(avatar);
+        messageRow.appendChild(wrapper);
+
+        chatContainer.appendChild(messageRow);
+        scrollToBottom();
+
+        // 히스토리 배열에 백업 추가
+        conversationHistory.push({ sender, text, time: timeString });
+        saveChatToLocalStorage();
+      }
+
+      // 타이핑 인디케이터 추가
+      function appendTypingIndicator() {
+        const messageRow = document.createElement("div");
+        messageRow.className = "message-row bot";
+        messageRow.id = "temp-indicator";
+
+        const avatar = document.createElement("div");
+        avatar.className = "avatar";
+        avatar.innerHTML = "🌿";
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "message-content-wrapper";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "sender-name";
+        nameSpan.textContent = "소담 🌿";
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+
+        const typing = document.createElement("div");
+        typing.className = "typing-indicator";
+        typing.innerHTML = `
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      `;
+
+        bubble.appendChild(typing);
+        wrapper.appendChild(nameSpan);
+        wrapper.appendChild(bubble);
+        messageRow.appendChild(avatar);
+        messageRow.appendChild(wrapper);
+
+        chatContainer.appendChild(messageRow);
+        scrollToBottom();
+        return messageRow;
+      }
+
+      function removeTypingIndicator(element) {
+        if (element && element.parentNode) {
+          element.parentNode.removeChild(element);
+        }
+      }
+
+      // 스크롤 최하단 이동
+      function scrollToBottom() {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+
+      // 간단한 마크다운 파서 함수
+      function parseMarkdown(text) {
+        // HTML 이스케이프 (XSS 안전처리)
+        let escaped = text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+
+        const lines = escaped.split("\n");
+        let html = "";
+        let inList = false;
+        let inCodeBlock = false;
+        let codeContent = [];
+        let codeLanguage = "";
+
+        for (let i = 0; i < lines.length; i++) {
+          let line = lines[i];
+
+          // 코드 블록 감지 (```)
+          if (line.trim().startsWith("```")) {
+            if (inCodeBlock) {
+              inCodeBlock = false;
+              html += `
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span>${codeLanguage.toUpperCase() || "CODE"}</span>
+                  <button class="copy-code-btn" onclick="copyCode(this)">코드 복사</button>
+                </div>
+                <pre><code>${codeContent.join("\n")}</code></pre>
+              </div>`;
+              codeContent = [];
+              codeLanguage = "";
+            } else {
+              inCodeBlock = true;
+              codeLanguage = line.trim().substring(3).trim();
+            }
+            continue;
+          }
+
+          if (inCodeBlock) {
+            codeContent.push(line);
+            continue;
+          }
+
+          // 언오더드 리스트 (-)
+          const listMatch = line.match(/^(\s*)[-*+]\s+(.+)$/);
+          if (listMatch) {
+            if (!inList) {
+              html += "<ul>";
+              inList = true;
+            }
+            let content = formatInlineMarkdown(listMatch[2]);
+            html += `<li>${content}</li>`;
+            continue;
+          } else if (inList && !listMatch) {
+            html += "</ul>";
+            inList = false;
+          }
+
+          // 헤더 (#)
+          const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
+          if (headerMatch) {
+            const level = headerMatch[1].length;
+            let content = formatInlineMarkdown(headerMatch[2]);
+            html += `<h${level}>${content}</h${level}>`;
+            continue;
+          }
+
+          // 빈 줄 처리
+          if (line.trim() === "") {
+            html += "<br>";
+          } else {
+            let formattedLine = formatInlineMarkdown(line);
+            html += `<p>${formattedLine}</p>`;
+          }
+        }
+
+        if (inList) {
+          html += "</ul>";
+        }
+        if (inCodeBlock) {
+          html += `<pre><code>${codeContent.join("\n")}</code></pre>`;
+        }
+
+        return html;
+      }
+
+      // 인라인 마크다운 포맷 (굵게, 기울임, 인라인코드)
+      function formatInlineMarkdown(text) {
+        // 굵게 (**텍스트**)
+        text = text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+        // 기울임 (*텍스트*)
+        text = text.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+        // 인라인 코드 (`코드`)
+        text = text.replace(
+          /`([^`]+)`/g,
+          '<code class="inline-code">$1</code>',
+        );
+        return text;
+      }
+
+      // 코드 블록 복사 함수
+      function copyCode(btn) {
+        const codeWrapper = btn.closest(".code-block-wrapper");
+        const codeElement = codeWrapper.querySelector("pre code");
+
+        const textArea = document.createElement("textarea");
+        textArea.value = codeElement.textContent;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+
+        showToast("코드가 클립보드에 복사되었습니다.");
+      }
+
+      // 커스텀 토스트 알림창 노출
+      function showToast(msg) {
+        const toast = document.getElementById("toast");
+        const toastMsg = document.getElementById("toastMsg");
+        toastMsg.textContent = msg;
+
+        toast.classList.add("show");
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2500);
+      }
+
+      // 로컬 스토리지 대화 저장
+      function saveChatToLocalStorage() {
+        if (saveHistoryToggle.checked) {
+          localStorage.setItem(
+            "sodam_chat_history",
+            JSON.stringify(conversationHistory),
+          );
+        }
+      }
+
+      // 로컬 스토리지 대화 불러오기
+      function loadChatFromLocalStorage() {
+        const saved = localStorage.getItem("sodam_chat_history");
+        if (saved) {
+          try {
+            conversationHistory = JSON.parse(saved);
+            if (conversationHistory.length > 0) {
+              welcomeScreen.style.display = "none";
+              conversationHistory.forEach((msg) => {
+                // 임시 렌더용 (시간 등은 그대로 파싱하여 뿌림)
+                const messageRow = document.createElement("div");
+                messageRow.className = `message-row ${msg.sender}`;
+
+                const avatar = document.createElement("div");
+                avatar.className = "avatar";
+                avatar.innerHTML = msg.sender === "user" ? "나" : "🌿";
+
+                const wrapper = document.createElement("div");
+                wrapper.className = "message-content-wrapper";
+
+                const nameSpan = document.createElement("span");
+                nameSpan.className = "sender-name";
+                nameSpan.textContent = msg.sender === "user" ? "나" : "소담 🌿";
+
+                const bubble = document.createElement("div");
+                bubble.className = "bubble";
+
+                if (msg.sender === "bot") {
+                  bubble.innerHTML = parseMarkdown(msg.text);
+                } else {
+                  bubble.innerHTML = msg.text.replace(/\n/g, "<br>");
+                }
+
+                const timeSpan = document.createElement("span");
+                timeSpan.className = "message-time";
+                timeSpan.textContent = msg.time || "";
+
+                wrapper.appendChild(nameSpan);
+                wrapper.appendChild(bubble);
+                wrapper.appendChild(timeSpan);
+
+                messageRow.appendChild(avatar);
+                messageRow.appendChild(wrapper);
+
+                chatContainer.appendChild(messageRow);
+              });
+              scrollToBottom();
+            }
+          } catch (e) {
+            console.error("로컬 스토리지 복원 오류:", e);
+            localStorage.removeItem("sodam_chat_history");
+          }
+        }
+      }
+
+      // 대화 내역 전체 초기화
+      function clearHistory() {
+        if (confirm("정말로 대화 기록을 초기화하시겠습니까?")) {
+          localStorage.removeItem("sodam_chat_history");
+          conversationHistory = [];
+
+          // 메세지 돔 전체 비우고 웰컴스크린 복원
+          const rows = chatContainer.querySelectorAll(".message-row");
+          rows.forEach((row) => row.remove());
+          welcomeScreen.style.display = "flex";
+
+          showToast("대화 내역이 초기화되었습니다.");
+        }
+      }
+
+      // 스크립트 실행
+      init();
+    </script>
+  </body>
+</html>
